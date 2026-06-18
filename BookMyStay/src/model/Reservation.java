@@ -2,19 +2,18 @@ package model;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class Reservation {
 
-    private final String reservationId;
-    private final RoomType roomType;
-    private final int roomsRequested;
+    private static int counter = 1;
 
-    // ✅ Assigned room IDs
-    private final Set<String> allocatedRoomIds = new HashSet<>();
+    private String reservationId;
+    private RoomType roomType;
+    private int roomsRequested;
+    private Set<String> allocatedRoomIds = new HashSet<>();
 
     public Reservation(RoomType roomType, int roomsRequested) {
-        this.reservationId = UUID.randomUUID().toString();
+        this.reservationId = "RES" + counter++;
         this.roomType = roomType;
         this.roomsRequested = roomsRequested;
     }
