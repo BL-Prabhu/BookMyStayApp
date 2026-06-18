@@ -2,47 +2,29 @@ package service;
 
 import model.RoomType;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
- * Handles room allocation with uniqueness guarantee.
+ * Allocates unique room IDs (prevents duplicates)
  */
 public class RoomAllocator {
 
-    // ✅ Prevent duplicate room IDs
-    private final Set<String> bookedRoomIds = new HashSet<>();
+    private final Set<String> usedRoomIds = new HashSet<>();
 
-    // ✅ RoomType → Assigned Room IDs
-    private final Map<RoomType, Set<String>> allocatedRooms = new HashMap<>();
-
-    /**
-     * Allocate unique rooms
-     */
     public Set<String> allocate(RoomType type, int count) {
+        Set<String> allocated = new HashSet<>();
 
-        Set<String> assignedRooms = new HashSet<>();
+        while (allocated.size() < count) {
+            String roomId = type.name() + "-" + UUID.randomUUID().toString().substring(0, 5);
 
-        for (int i = 0; i < count; i++) {
-
-            String roomId;
-
-            // ✅ Ensure unique room ID
-            do {
-                roomId = type.name() + "-" + UUID.randomUUID().toString().substring(0, 5);
-            } while (bookedRoomIds.contains(roomId));
-
-            bookedRoomIds.add(roomId);
-            assignedRooms.add(roomId);
+            if (!usedRoomIds.contains(roomId)) {
+                usedRoomIds.add(roomId);
+                allocated.add(roomId);
+            }
         }
 
-        allocatedRooms
-                .computeIfAbsent(type, k -> new HashSet<>())
-                .addAll(assignedRooms);
-
-        return assignedRooms;
-    }
-
-    public Map<RoomType, Set<String>> getAllocatedRooms() {
-        return allocatedRooms;
+        return allocated;
     }
 }

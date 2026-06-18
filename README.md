@@ -1,169 +1,132 @@
-# 📘 Use Case 4 (UC4) – Reservation Confirmation & Room Allocation
+# 📘 Use Case 5: Add-On Service Selection
 
 ---
 
 ## 📌 Overview
 
-Use Case 4 focuses on **finalizing bookings** by assigning **unique room IDs** and ensuring **zero double-booking**.
-
-After processing booking requests (UC3), this stage:
-
-* Allocates actual rooms
-* Guarantees uniqueness
-* Updates inventory instantly
+This module enables guests to enhance their booking experience by adding optional services such as **breakfast, spa, and airport pickup**.
+It supports multiple services per reservation and calculates the total additional cost.
 
 ---
 
-## 🎯 Objective
+## 🎯 Goal
 
-* Assign unique room IDs to each booking
-* Prevent duplicate room allocation
-* Maintain strong booking integrity
-* Synchronize inventory in real-time
-
----
-
-## 🏗️ Key Data Structures
-
-### 1. Track Booked Room IDs
-
-```java
-Set<String> bookedRoomIds = new HashSet<>();
-```
-
-* Ensures **no duplicate room IDs**
-* Maintains global uniqueness
-
----
-
-### 2. Room Allocation Mapping
-
-```java
-Map<RoomType, Set<String>> allocatedRooms = new HashMap<>();
-```
-
-* Maps each room type to its allocated room IDs
-* Helps track assigned rooms per category
+Enhance bookings with optional services and ensure accurate and automated cost calculation.
 
 ---
 
 ## 🧠 Key Concepts
 
-### 🔹 Uniqueness Enforcement
-
-Each room is assigned a **unique ID** using UUID.
-
-### 🔹 Duplicate Prevention
-
-HashSet ensures:
-
-* No repeated room IDs
-* No double booking
-
-### 🔹 Atomic Allocation (Logical)
-
-* Allocation + inventory update happen together
-* Prevents inconsistent state
+* One-to-many mapping (One reservation → Multiple services)
+* Composition (Services attached to reservation)
+* Extensible service model
 
 ---
 
-## ⚙️ Key Requirements
+## 🗂️ Key Data Structures
 
-* Assign unique room IDs
-* Prevent reuse of room IDs
-* Update room availability immediately
-* Maintain booking integrity
+* `Map<String, List<Service>>`
 
----
-
-## 🎭 Actors
-
-| Actor             | Role                            |
-| ----------------- | ------------------------------- |
-| Booking Service   | Processes and confirms bookings |
-| Inventory Service | Maintains room availability     |
+    * Maps **Reservation ID → List of Services**
 
 ---
 
-## 🔄 Flow of Execution
+## ⚙️ Features
 
-1. Dequeue booking request
-2. Check room availability
-3. Generate unique room IDs
-4. Store IDs in HashSet
-5. Map IDs to room type
-6. Update inventory count
-
-```
-Dequeue → Allocate Room ID → Store in Set → Update Inventory
-```
+* Add multiple services to a reservation
+* View all selected services
+* Calculate total add-on cost
+* Easy to extend with new services
 
 ---
 
-## ✅ Key Benefits
+## 👥 Actors
 
-* ✔ Strong booking integrity
-* ✔ Zero double-booking
-* ✔ Instant inventory synchronization
-* ✔ Clear room tracking
-* ✔ Production-ready design
+* Guest
+* Service Management Module
 
 ---
 
-## ⚠️ Limitations of Previous Approach (UC3)
+## 🔄 Flow
 
-| Problem               | Description                        |
-| --------------------- | ---------------------------------- |
-| Room overlap          | Same room could be allocated twice |
-| No uniqueness         | No tracking of actual room IDs     |
-| Guest dissatisfaction | Conflicts during check-in          |
-
----
-
-## 🚀 How UC4 Solves It
-
-| Issue              | Solution                          |
-| ------------------ | --------------------------------- |
-| Duplicate booking  | HashSet ensures uniqueness        |
-| No room tracking   | Map stores allocated rooms        |
-| Inventory mismatch | Immediate update after allocation |
+1. Guest selects an add-on service
+2. Service is added to the reservation
+3. Stored in a map against reservation ID
+4. Multiple services can be added
+5. Total cost is calculated when required
 
 ---
 
-## 🧪 Example Output
+## 📦 Project Structure
 
-```
-Processing bookings...
+```text
+model/
+  ├── Service.java
+  ├── Reservation.java
+  └── RoomType.java
 
-✅ BOOKED: R1 Rooms: [SINGLE-a12bc]
-✅ BOOKED: R2 Rooms: [SINGLE-x78yz]
-❌ FAILED: R3 | Not enough rooms
+service/
+  ├── AddOnService.java
+  └── AddOnServiceImpl.java
+
+controller/
+  └── ServiceController.java
+
+main/
+  └── BookMyStayApplication.java
 ```
 
 ---
 
-## 🔮 Future Enhancements
+## ▶️ How to Run
 
-* Thread-safe allocation (ConcurrentHashMap)
-* Persistent storage (Database)
-* Distributed locking (Redis)
-* Payment confirmation before allocation
-* Booking cancellation & rollback
+1. Compile the project
+2. Run `BookMyStayApplication.java`
+3. Observe console output
 
 ---
 
-## 🏁 Conclusion
+## 💻 Sample Output
 
-UC4 ensures a **robust and reliable booking system** by:
+```text
+Service added to RES123: Breakfast
+Service added to RES123: Spa
+Service added to RES123: Airport Pickup
 
-* Guaranteeing unique room allocation
-* Preventing duplicate bookings
-* Maintaining real-time inventory consistency
+Services for Reservation RES123:
+- Breakfast (₹500.0)
+- Spa (₹1500.0)
+- Airport Pickup (₹800.0)
 
-This design reflects **real-world booking systems** used in:
+Total Add-on Cost for RES123: ₹2800.0
+```
 
-* Hotels
-* Airlines
-* Ticketing platforms
+---
+
+## ✅ Benefits
+
+* Flexible service attachment
+* Clean mapping between reservation and services
+* Accurate billing
+* Easy future expansion
+
+---
+
+## ⚠️ Limitations of Previous Approach
+
+* Manual service handling
+* Billing errors
+* No structured mapping
+* Difficult to scale
+
+---
+
+## 🚀 Future Enhancements
+
+* Categorize services (Food, Travel, Wellness)
+* Integrate with billing module
+* Add discount and offers
+* Store data in database
+* Expose REST APIs
 
 ---
