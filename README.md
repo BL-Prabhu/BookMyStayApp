@@ -1,131 +1,136 @@
-# 📘 Use Case 2 (UC2) – Search Available Rooms
+# 📘 Use Case 3 (UC3) – Booking Request (First-Come-First-Served)
+
+---
 
 ## 📌 Overview
 
-Use Case 2 allows users to **search for available rooms** in the system.
-It retrieves room data from the inventory and displays only rooms that have **available count greater than zero**.
+Use Case 3 introduces a **Booking Queue System** that processes room reservations using the **First-Come-First-Served (FCFS)** principle.
+
+Instead of handling booking requests in parallel (which can cause inconsistencies), requests are **queued and processed sequentially**, ensuring fairness and reliability.
 
 ---
 
 ## 🎯 Objective
 
-* Show all available rooms to the user
-* Filter out rooms with zero availability
-* Provide room details like:
-
-  * Room Type
-  * Available Count
-  * Price
+* Accept booking requests from users
+* Maintain strict **arrival order (FIFO)**
+* Allocate rooms fairly during high demand
+* Prevent inconsistent or duplicate bookings
 
 ---
 
-## 🏗️ Components Involved
+## 🏗️ Key Data Structures
 
-### 1. **SearchController**
+### Queue for Booking Requests
 
-* Acts as the entry point for UC2
-* Calls the service layer
-* Displays results to the user
+```java
+Queue<Reservation> bookingQueue = new LinkedList<>();
+```
 
-### 2. **SearchService**
+* Stores incoming booking requests
+* Ensures **FIFO (First-In-First-Out)** processing
+* Maintains order of arrival
 
-* Interface defining search functionality
+---
 
-### 3. **SearchServiceImpl**
+## 🧠 Key Concepts
 
-* Implements search logic
-* Fetches data from InventoryService
-* Filters available rooms
+### 1. FIFO Principle
 
-### 4. **InventoryService**
+* Requests are processed in the exact order they arrive
+* First request → First processed
 
-* Provides room count and price data
+### 2. Fair Allocation
 
-### 5. **RoomInventory Model**
+* Every user gets equal opportunity
+* No request skipping or priority bias
 
-* Represents room details (type, count, price)
+### 3. Request Ordering
+
+* Ensures predictable system behavior
+* Important during peak traffic
+
+---
+
+## ⚙️ Key Requirements
+
+* Accept booking requests
+* Add requests to queue
+* Process requests sequentially
+* Allocate rooms based on availability
+* Handle high-traffic scenarios safely
+
+---
+
+## 🎭 Actors
+
+| Actor                 | Role                                 |
+| --------------------- | ------------------------------------ |
+| Guest                 | Sends booking request                |
+| Booking Queue Service | Manages queue and processes requests |
 
 ---
 
 ## 🔄 Flow of Execution
 
-1. User triggers search (via `SearchController`)
-2. Controller calls `SearchService`
-3. Service fetches:
+1. Guest sends booking request
+2. Request is added to queue
+3. System processes requests one-by-one
+4. Room availability is checked
+5. Booking is confirmed or rejected
 
-  * Room counts
-  * Room prices
-4. Filters rooms where:
-
-   ```
-   count > 0
-   ```
-5. Returns list of available rooms
-6. Controller displays results
-
----
-
-## ⚙️ Key Logic
-
-```java
-if (count > 0) {
-    result.add(new RoomInventory(type, count, price));
-}
+```
+Booking Request → Enqueue → Process → Allocate Room
 ```
 
 ---
 
-## ✅ Expected Output
+## ✅ Key Benefits
 
-### Case 1: Rooms Available
-
-```
-✅ Available Rooms:
-RoomInventory{roomType=SINGLE, count=5, price=1200.0}
-RoomInventory{roomType=DOUBLE, count=3, price=2000.0}
-RoomInventory{roomType=SUITE, count=1, price=5000.0}
-```
-
-### Case 2: No Rooms Available
-
-```
-❌ No rooms available
-```
+* ✔ Predictable booking order
+* ✔ No race conditions at request level
+* ✔ Fair allocation for all users
+* ✔ Handles high traffic efficiently
+* ✔ Real-world booking simulation
 
 ---
 
-## 🚫 Exception Handling Strategy
+## ⚠️ Limitations of Previous Approach
 
-* ❌ No exception is thrown if no rooms are available
-* ✅ Empty list is returned instead
-* Improves user experience and prevents application crash
-
----
-
-## 🧠 Design Decisions
-
-* Uses **InventoryService** as a data source (separation of concerns)
-* Uses **RoomInventory model** for structured data
-* Avoids exposing internal data structures directly
-* Keeps logic simple and scalable
+| Problem                 | Description                         |
+| ----------------------- | ----------------------------------- |
+| Parallel Requests       | Multiple users booking at same time |
+| Race Conditions         | Same room booked multiple times     |
+| Inconsistent Allocation | Unfair booking results              |
 
 ---
 
-## 🚀 Future Enhancements
+## 🚀 How UC3 Solves It
 
-* Filter by price range
-* Filter by room type
-* Add date-based availability
-* Pagination for large datasets
+| Issue              | Solution               |
+| ------------------ | ---------------------- |
+| Concurrency issues | Queue-based processing |
+| Double booking     | Sequential execution   |
+| Unfair allocation  | FIFO ordering          |
+
+---
+
+## 🔮 Future Enhancements
+
+* Priority queue (VIP users)
+* Timeout for stale requests
+* Distributed queue (Kafka / RabbitMQ)
+* Retry mechanism for failed bookings
+* Payment integration before confirmation
 
 ---
 
 ## 🏁 Conclusion
 
-UC2 successfully enables users to:
+UC3 ensures a **fair, consistent, and scalable booking system** by:
 
-* View available rooms
-* Get real-time inventory data
-* Experience smooth and crash-free search functionality
+* Enforcing strict request order
+* Eliminating race conditions
+* Providing real-world reliability during peak demand
 
 ---
