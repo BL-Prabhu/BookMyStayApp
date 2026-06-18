@@ -1,132 +1,72 @@
-# 📘 Use Case 5: Add-On Service Selection
-
----
+# 📘 Use Case 6: Booking History & Reporting
 
 ## 📌 Overview
 
-This module enables guests to enhance their booking experience by adding optional services such as **breakfast, spa, and airport pickup**.
-It supports multiple services per reservation and calculates the total additional cost.
+This module maintains a complete history of all bookings, enabling tracking, cancellation, and reporting.
 
 ---
 
 ## 🎯 Goal
 
-Enhance bookings with optional services and ensure accurate and automated cost calculation.
+Maintain a reliable and structured booking history for audit and reporting.
 
 ---
 
 ## 🧠 Key Concepts
 
-* One-to-many mapping (One reservation → Multiple services)
-* Composition (Services attached to reservation)
-* Extensible service model
+* Ordered data storage (List)
+* Historical tracking
+* Audit trail
+* Reporting system
 
 ---
 
-## 🗂️ Key Data Structures
+## 🗂️ Data Structure
 
-* `Map<String, List<Service>>`
-
-    * Maps **Reservation ID → List of Services**
+* `List<Reservation>` → Stores all confirmed bookings
 
 ---
 
 ## ⚙️ Features
 
-* Add multiple services to a reservation
-* View all selected services
-* Calculate total add-on cost
-* Easy to extend with new services
+* Store confirmed bookings
+* Cancel reservations
+* Retrieve booking history
+* Generate reports
 
 ---
 
 ## 👥 Actors
 
-* Guest
-* Service Management Module
+* Admin
+* Reporting Service
 
 ---
 
 ## 🔄 Flow
 
-1. Guest selects an add-on service
-2. Service is added to the reservation
-3. Stored in a map against reservation ID
-4. Multiple services can be added
-5. Total cost is calculated when required
-
----
-
-## 📦 Project Structure
-
-```text
-model/
-  ├── Service.java
-  ├── Reservation.java
-  └── RoomType.java
-
-service/
-  ├── AddOnService.java
-  └── AddOnServiceImpl.java
-
-controller/
-  └── ServiceController.java
-
-main/
-  └── BookMyStayApplication.java
-```
-
----
-
-## ▶️ How to Run
-
-1. Compile the project
-2. Run `BookMyStayApplication.java`
-3. Observe console output
+Booking Confirmed → Add to List → Store → Retrieve → Report
 
 ---
 
 ## 💻 Sample Output
 
-```text
-Service added to RES123: Breakfast
-Service added to RES123: Spa
-Service added to RES123: Airport Pickup
-
-Services for Reservation RES123:
-- Breakfast (₹500.0)
-- Spa (₹1500.0)
-- Airport Pickup (₹800.0)
-
-Total Add-on Cost for RES123: ₹2800.0
-```
+===== BOOKING REPORT =====
+RES1 | SINGLE | Rooms: 1 | Status: CANCELLED
+RES2 | SINGLE | Rooms: 2 | Status: CONFIRMED
 
 ---
 
 ## ✅ Benefits
 
-* Flexible service attachment
-* Clean mapping between reservation and services
-* Accurate billing
-* Easy future expansion
-
----
-
-## ⚠️ Limitations of Previous Approach
-
-* Manual service handling
-* Billing errors
-* No structured mapping
-* Difficult to scale
+* Full audit trail
+* Easy reporting
+* Better customer support
 
 ---
 
 ## 🚀 Future Enhancements
 
-* Categorize services (Food, Travel, Wellness)
-* Integrate with billing module
-* Add discount and offers
-* Store data in database
-* Expose REST APIs
-
----
+* Database integration
+* Export reports (PDF/CSV)
+* Analytics dashboard
