@@ -1,15 +1,17 @@
 package model;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-/**
- * Represents a booking request.
- */
 public class Reservation {
 
     private final String reservationId;
     private final RoomType roomType;
     private final int roomsRequested;
+
+    // ✅ Assigned room IDs
+    private final Set<String> allocatedRoomIds = new HashSet<>();
 
     public Reservation(RoomType roomType, int roomsRequested) {
         this.reservationId = UUID.randomUUID().toString();
@@ -27,5 +29,9 @@ public class Reservation {
 
     public int getRoomsRequested() {
         return roomsRequested;
+    }
+
+    public Set<String> getAllocatedRoomIds() {
+        return allocatedRoomIds;
     }
 }
