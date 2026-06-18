@@ -1,136 +1,169 @@
-# 📘 Use Case 3 (UC3) – Booking Request (First-Come-First-Served)
+# 📘 Use Case 4 (UC4) – Reservation Confirmation & Room Allocation
 
 ---
 
 ## 📌 Overview
 
-Use Case 3 introduces a **Booking Queue System** that processes room reservations using the **First-Come-First-Served (FCFS)** principle.
+Use Case 4 focuses on **finalizing bookings** by assigning **unique room IDs** and ensuring **zero double-booking**.
 
-Instead of handling booking requests in parallel (which can cause inconsistencies), requests are **queued and processed sequentially**, ensuring fairness and reliability.
+After processing booking requests (UC3), this stage:
+
+* Allocates actual rooms
+* Guarantees uniqueness
+* Updates inventory instantly
 
 ---
 
 ## 🎯 Objective
 
-* Accept booking requests from users
-* Maintain strict **arrival order (FIFO)**
-* Allocate rooms fairly during high demand
-* Prevent inconsistent or duplicate bookings
+* Assign unique room IDs to each booking
+* Prevent duplicate room allocation
+* Maintain strong booking integrity
+* Synchronize inventory in real-time
 
 ---
 
 ## 🏗️ Key Data Structures
 
-### Queue for Booking Requests
+### 1. Track Booked Room IDs
 
 ```java
-Queue<Reservation> bookingQueue = new LinkedList<>();
+Set<String> bookedRoomIds = new HashSet<>();
 ```
 
-* Stores incoming booking requests
-* Ensures **FIFO (First-In-First-Out)** processing
-* Maintains order of arrival
+* Ensures **no duplicate room IDs**
+* Maintains global uniqueness
+
+---
+
+### 2. Room Allocation Mapping
+
+```java
+Map<RoomType, Set<String>> allocatedRooms = new HashMap<>();
+```
+
+* Maps each room type to its allocated room IDs
+* Helps track assigned rooms per category
 
 ---
 
 ## 🧠 Key Concepts
 
-### 1. FIFO Principle
+### 🔹 Uniqueness Enforcement
 
-* Requests are processed in the exact order they arrive
-* First request → First processed
+Each room is assigned a **unique ID** using UUID.
 
-### 2. Fair Allocation
+### 🔹 Duplicate Prevention
 
-* Every user gets equal opportunity
-* No request skipping or priority bias
+HashSet ensures:
 
-### 3. Request Ordering
+* No repeated room IDs
+* No double booking
 
-* Ensures predictable system behavior
-* Important during peak traffic
+### 🔹 Atomic Allocation (Logical)
+
+* Allocation + inventory update happen together
+* Prevents inconsistent state
 
 ---
 
 ## ⚙️ Key Requirements
 
-* Accept booking requests
-* Add requests to queue
-* Process requests sequentially
-* Allocate rooms based on availability
-* Handle high-traffic scenarios safely
+* Assign unique room IDs
+* Prevent reuse of room IDs
+* Update room availability immediately
+* Maintain booking integrity
 
 ---
 
 ## 🎭 Actors
 
-| Actor                 | Role                                 |
-| --------------------- | ------------------------------------ |
-| Guest                 | Sends booking request                |
-| Booking Queue Service | Manages queue and processes requests |
+| Actor             | Role                            |
+| ----------------- | ------------------------------- |
+| Booking Service   | Processes and confirms bookings |
+| Inventory Service | Maintains room availability     |
 
 ---
 
 ## 🔄 Flow of Execution
 
-1. Guest sends booking request
-2. Request is added to queue
-3. System processes requests one-by-one
-4. Room availability is checked
-5. Booking is confirmed or rejected
+1. Dequeue booking request
+2. Check room availability
+3. Generate unique room IDs
+4. Store IDs in HashSet
+5. Map IDs to room type
+6. Update inventory count
 
 ```
-Booking Request → Enqueue → Process → Allocate Room
+Dequeue → Allocate Room ID → Store in Set → Update Inventory
 ```
 
 ---
 
 ## ✅ Key Benefits
 
-* ✔ Predictable booking order
-* ✔ No race conditions at request level
-* ✔ Fair allocation for all users
-* ✔ Handles high traffic efficiently
-* ✔ Real-world booking simulation
+* ✔ Strong booking integrity
+* ✔ Zero double-booking
+* ✔ Instant inventory synchronization
+* ✔ Clear room tracking
+* ✔ Production-ready design
 
 ---
 
-## ⚠️ Limitations of Previous Approach
+## ⚠️ Limitations of Previous Approach (UC3)
 
-| Problem                 | Description                         |
-| ----------------------- | ----------------------------------- |
-| Parallel Requests       | Multiple users booking at same time |
-| Race Conditions         | Same room booked multiple times     |
-| Inconsistent Allocation | Unfair booking results              |
+| Problem               | Description                        |
+| --------------------- | ---------------------------------- |
+| Room overlap          | Same room could be allocated twice |
+| No uniqueness         | No tracking of actual room IDs     |
+| Guest dissatisfaction | Conflicts during check-in          |
 
 ---
 
-## 🚀 How UC3 Solves It
+## 🚀 How UC4 Solves It
 
-| Issue              | Solution               |
-| ------------------ | ---------------------- |
-| Concurrency issues | Queue-based processing |
-| Double booking     | Sequential execution   |
-| Unfair allocation  | FIFO ordering          |
+| Issue              | Solution                          |
+| ------------------ | --------------------------------- |
+| Duplicate booking  | HashSet ensures uniqueness        |
+| No room tracking   | Map stores allocated rooms        |
+| Inventory mismatch | Immediate update after allocation |
+
+---
+
+## 🧪 Example Output
+
+```
+Processing bookings...
+
+✅ BOOKED: R1 Rooms: [SINGLE-a12bc]
+✅ BOOKED: R2 Rooms: [SINGLE-x78yz]
+❌ FAILED: R3 | Not enough rooms
+```
 
 ---
 
 ## 🔮 Future Enhancements
 
-* Priority queue (VIP users)
-* Timeout for stale requests
-* Distributed queue (Kafka / RabbitMQ)
-* Retry mechanism for failed bookings
-* Payment integration before confirmation
+* Thread-safe allocation (ConcurrentHashMap)
+* Persistent storage (Database)
+* Distributed locking (Redis)
+* Payment confirmation before allocation
+* Booking cancellation & rollback
 
 ---
 
 ## 🏁 Conclusion
 
-UC3 ensures a **fair, consistent, and scalable booking system** by:
+UC4 ensures a **robust and reliable booking system** by:
 
-* Enforcing strict request order
-* Eliminating race conditions
-* Providing real-world reliability during peak demand
+* Guaranteeing unique room allocation
+* Preventing duplicate bookings
+* Maintaining real-time inventory consistency
+
+This design reflects **real-world booking systems** used in:
+
+* Hotels
+* Airlines
+* Ticketing platforms
 
 ---

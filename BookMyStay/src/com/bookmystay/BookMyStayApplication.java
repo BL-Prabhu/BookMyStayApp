@@ -8,25 +8,22 @@ public class BookMyStayApplication {
 
     public static void main(String[] args) {
 
-        // ✅ Setup Inventory
-        InventoryService inventoryService = new InventoryServiceImpl();
-        inventoryService.addRoomType(RoomType.SINGLE, 2, 1000);
-        inventoryService.addRoomType(RoomType.DOUBLE, 1, 2000);
+        InventoryService inventory = new InventoryServiceImpl();
 
-        // ✅ Setup Booking System
-        BookingService bookingService = new BookingServiceImpl(inventoryService);
+        inventory.addRoomType(RoomType.SINGLE, 2, 1000);
+        inventory.addRoomType(RoomType.DOUBLE, 1, 2000);
+
+        BookingService bookingService = new BookingServiceImpl(inventory);
         BookingController controller = new BookingController(bookingService);
 
-        // ✅ Simulate multiple booking requests (FCFS)
-        controller.book(RoomType.SINGLE, 1); // success
-        controller.book(RoomType.SINGLE, 1); // success
-        controller.book(RoomType.SINGLE, 1); // fail (no rooms left)
-        controller.book(RoomType.DOUBLE, 1); // success
+        controller.book(RoomType.SINGLE, 1);
+        controller.book(RoomType.SINGLE, 1);
+        controller.book(RoomType.SINGLE, 1); // fail
+        controller.book(RoomType.DOUBLE, 1);
         controller.book(RoomType.DOUBLE, 1); // fail
 
         System.out.println("\nProcessing bookings...\n");
 
-        // ✅ Process queue
         controller.process();
     }
 }
