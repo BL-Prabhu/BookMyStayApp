@@ -1,6 +1,7 @@
 package com.bookmystay;
 
 import controller.BookingController;
+import controller.HistoryController;
 import model.RoomType;
 import service.*;
 
@@ -9,21 +10,29 @@ public class BookMyStayApplication {
     public static void main(String[] args) {
 
         InventoryService inventory = new InventoryServiceImpl();
+        BookingHistoryService history = new BookingHistoryServiceImpl();
 
-        // Setup rooms
         inventory.addRoomType(RoomType.SINGLE, 2, 1000);
-        inventory.addRoomType(RoomType.DOUBLE, 1, 2000);
 
-        BookingController controller =
-                new BookingController(new BookingServiceImpl(inventory));
+        BookingService bookingService =
+                new BookingServiceImpl(inventory, history);
 
-        // Requests (FIFO Queue)
-        controller.book(RoomType.SINGLE, 1);
-        controller.book(RoomType.SINGLE, 2); // will fail
-        controller.book(RoomType.DOUBLE, 1);
+        BookingController bookingController =
+                new BookingController(bookingService);
 
-        System.out.println("\nProcessing...\n");
+        HistoryController historyController =
+                new HistoryController(history);
 
-        controller.process();
+        // Bookings
+        bookingController.book(RoomType.SINGLE, 1);
+        bookingController.book(RoomType.SINGLE, 2);
+
+        bookingController.process();
+
+        // Cancel one booking
+        historyController.cancel("RES1");
+
+        // Report
+        historyController.report();
     }
 }
