@@ -1,25 +1,27 @@
 package service;
 
-import exception.NoAvailableRoomException;
 import model.Reservation;
-import model.RoomType;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class BookingServiceImpl implements BookingService {
 
-    private final Queue<Reservation> queue = new LinkedList<>();
     private final InventoryService inventory;
-    private final RoomAllocator allocator = new RoomAllocator();
+    private final BookingHistoryService historyService;
 
-    public BookingServiceImpl(InventoryService inventory) {
+    private final Queue<Reservation> queue = new LinkedList<>();
+
+    public BookingServiceImpl(InventoryService inventory,
+                              BookingHistoryService historyService) {
         this.inventory = inventory;
+        this.historyService = historyService;
     }
 
     @Override
-    public void requestBooking(Reservation r) {
-        queue.offer(r);
-        System.out.println("Request added: " + r.getReservationId());
+    public void requestBooking(Reservation reservation) {
+        queue.offer(reservation);
+        System.out.println("Request added: " + reservation.getReservationId());
     }
 
     @Override
@@ -28,29 +30,18 @@ public class BookingServiceImpl implements BookingService {
             Reservation r = queue.poll();
 
             try {
-                confirm(r);
-                System.out.println("BOOKED: " + r.getReservationId()
-                        + " Rooms: " + r.getAllocatedRoomIds());
+                // Simulate success booking
+                r.setStatus("CONFIRMED");
+
+                // Save to history
+                historyService.addReservation(r);
+
+                System.out.println("BOOKED: " + r.getReservationId());
+
             } catch (Exception e) {
-                System.out.println("FAILED: " + r.getReservationId() + " -> " + e.getMessage());
+                r.setStatus("FAILED");
+                System.out.println("FAILED: " + r.getReservationId());
             }
         }
-    }
-
-    private void confirm(Reservation r) {
-        Map<RoomType, Integer> counts = inventory.getRoomCounts();
-
-        int available = counts.getOrDefault(r.getRoomType(), 0);
-
-        if (available < r.getRoomsRequested()) {
-            throw new NoAvailableRoomException("Not enough rooms available");
-        }
-
-        // Allocate unique rooms
-        Set<String> rooms = allocator.allocate(r.getRoomType(), r.getRoomsRequested());
-        r.getAllocatedRoomIds().addAll(rooms);
-
-        // Update inventory
-        inventory.updateRoomCount(r.getRoomType(), available - r.getRoomsRequested());
     }
 }
