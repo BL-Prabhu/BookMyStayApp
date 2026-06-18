@@ -4,68 +4,53 @@ import exception.NoAvailableRoomException;
 import model.Reservation;
 import model.RoomType;
 
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class BookingServiceImpl implements BookingService {
 
-    private final Queue<Reservation> bookingQueue = new LinkedList<>();
-    private final InventoryService inventoryService;
-    private final RoomAllocator roomAllocator = new RoomAllocator();
+    private final Queue<Reservation> queue = new LinkedList<>();
+    private final InventoryService inventory;
+    private final RoomAllocator allocator = new RoomAllocator();
 
-    public BookingServiceImpl(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
+    public BookingServiceImpl(InventoryService inventory) {
+        this.inventory = inventory;
     }
 
     @Override
-    public void requestBooking(Reservation reservation) {
-        bookingQueue.offer(reservation);
-        System.out.println("Request added: " + reservation.getReservationId());
+    public void requestBooking(Reservation r) {
+        queue.offer(r);
+        System.out.println("Request added: " + r.getReservationId());
     }
 
     @Override
     public void processBookings() {
-
-        while (!bookingQueue.isEmpty()) {
-
-            Reservation reservation = bookingQueue.poll();
+        while (!queue.isEmpty()) {
+            Reservation r = queue.poll();
 
             try {
-                confirmBooking(reservation);
-
-                System.out.println("✅ BOOKED: " + reservation.getReservationId()
-                        + " Rooms: " + reservation.getAllocatedRoomIds());
-
-            } catch (NoAvailableRoomException e) {
-                System.out.println("❌ FAILED: " + reservation.getReservationId()
-                        + " | " + e.getMessage());
+                confirm(r);
+                System.out.println("BOOKED: " + r.getReservationId()
+                        + " Rooms: " + r.getAllocatedRoomIds());
+            } catch (Exception e) {
+                System.out.println("FAILED: " + r.getReservationId() + " -> " + e.getMessage());
             }
         }
     }
 
-    /**
-     * UC4 Core Logic
-     */
-    private void confirmBooking(Reservation reservation) {
+    private void confirm(Reservation r) {
+        Map<RoomType, Integer> counts = inventory.getRoomCounts();
 
-        RoomType type = reservation.getRoomType();
-        int requested = reservation.getRoomsRequested();
+        int available = counts.getOrDefault(r.getRoomType(), 0);
 
-        Map<RoomType, Integer> counts = inventoryService.getRoomCounts();
-
-        int available = counts.getOrDefault(type, 0);
-
-        if (available < requested) {
-            throw new NoAvailableRoomException("Not enough rooms for " + type);
+        if (available < r.getRoomsRequested()) {
+            throw new NoAvailableRoomException("Not enough rooms available");
         }
 
-        // ✅ Allocate unique room IDs
-        Set<String> assignedRooms = roomAllocator.allocate(type, requested);
-        reservation.getAllocatedRoomIds().addAll(assignedRooms);
+        // Allocate unique rooms
+        Set<String> rooms = allocator.allocate(r.getRoomType(), r.getRoomsRequested());
+        r.getAllocatedRoomIds().addAll(rooms);
 
-        // ✅ Update inventory immediately
-        inventoryService.updateRoomCount(type, available - requested);
+        // Update inventory
+        inventory.updateRoomCount(r.getRoomType(), available - r.getRoomsRequested());
     }
 }
