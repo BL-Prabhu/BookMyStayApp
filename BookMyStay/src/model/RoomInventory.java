@@ -1,61 +1,43 @@
 package model;
 
-import java.util.Objects;
-
-/**
- * Represents inventory details for a specific room type.
- */
 public class RoomInventory {
 
-    private final RoomType roomType;
-    private int availableCount;
-    private double pricePerNight;
+    private RoomType roomType;
+    private int count;
+    private double price;
 
-    public RoomInventory(RoomType roomType, int availableCount, double pricePerNight) {
+    public RoomInventory(RoomType roomType, int count, double price) {
         this.roomType = roomType;
-        this.availableCount = availableCount;
-        this.pricePerNight = pricePerNight;
+        this.count = count;
+        this.price = price;
     }
 
     public RoomType getRoomType() {
         return roomType;
     }
 
-    public int getAvailableCount() {
-        return availableCount;
+    public int getCount() {
+        return count;
     }
 
-    public double getPricePerNight() {
-        return pricePerNight;
+    public double getPrice() {
+        return price;
     }
 
-    public void updateCount(int newCount) {
-        this.availableCount = newCount;
+    public void setCount(int count) {
+        this.count = count;
     }
 
-    public void updatePrice(double newPrice) {
-        this.pricePerNight = newPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     @Override
     public String toString() {
         return "RoomInventory{" +
                 "roomType=" + roomType +
-                ", availableCount=" + availableCount +
-                ", pricePerNight=" + pricePerNight +
+                ", count=" + count +
+                ", price=" + price +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RoomInventory)) return false;
-        RoomInventory that = (RoomInventory) o;
-        return roomType == that.roomType;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(roomType);
     }
 }

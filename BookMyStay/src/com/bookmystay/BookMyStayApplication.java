@@ -1,28 +1,26 @@
 package com.bookmystay;
 
 import controller.InventoryController;
+import controller.SearchController;
 import model.RoomType;
-import service.InventoryService;
-import service.InventoryServiceImpl;
+import service.*;
 
-/**
- * Entry point for Use Case 1 execution.
- */
 public class BookMyStayApplication {
 
     public static void main(String[] args) {
 
         InventoryService inventoryService = new InventoryServiceImpl();
-        InventoryController controller = new InventoryController(inventoryService);
+        SearchService searchService = new SearchServiceImpl(inventoryService);
 
-        // Use Case Flow
-        controller.handleAddRoom(RoomType.SINGLE, 10, 2000);
-        controller.handleAddRoom(RoomType.DOUBLE, 5, 3500);
+        InventoryController inventoryController = new InventoryController(inventoryService);
+        SearchController searchController = new SearchController(searchService);
 
-        controller.handleUpdateRoomCount(RoomType.SINGLE, 8);
-        controller.handleUpdateRoomPrice(RoomType.DOUBLE, 3700);
+        // UC1
+        inventoryController.addRoom(RoomType.SINGLE, 5, 1200);
+        inventoryController.addRoom(RoomType.DOUBLE, 3, 2000);
+        inventoryController.addRoom(RoomType.SUITE, 1, 5000);
 
-        controller.handleGetRoomDetails(RoomType.SINGLE);
-        controller.handleGetAllRooms();
+        // UC2
+        searchController.searchRooms();
     }
 }

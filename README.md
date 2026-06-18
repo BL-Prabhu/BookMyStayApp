@@ -1,177 +1,131 @@
-# 🏨 BookMyStay – Room Inventory Management (Use Case 1)
+# 📘 Use Case 2 (UC2) – Search Available Rooms
 
 ## 📌 Overview
 
-BookMyStay is a hotel booking system.
-This module implements **Use Case 1: Room Inventory Setup & Management** using Core Java.
-
-It provides a centralized way to manage hotel room inventory, including:
-
-* Room types
-* Availability counts
-* Pricing
-
-The system ensures **fast lookup, clean design, and scalability**.
+Use Case 2 allows users to **search for available rooms** in the system.
+It retrieves room data from the inventory and displays only rooms that have **available count greater than zero**.
 
 ---
 
 ## 🎯 Objective
 
-To maintain a **single source of truth** for hotel room inventory with:
+* Show all available rooms to the user
+* Filter out rooms with zero availability
+* Provide room details like:
 
-* O(1) access time
-* Consistent data handling
-* Easy extensibility for future features (booking, payments, etc.)
-
----
-
-## 🧩 Features
-
-* Add new room types (Single, Double, Suite)
-* Update room availability count
-* Update room pricing
-* Fetch room details
-* View complete inventory
-* Thread-safe operations
+  * Room Type
+  * Available Count
+  * Price
 
 ---
 
-## 🏗️ Project Structure
+## 🏗️ Components Involved
 
-```
-com.bookmystay
-│
-├── controller
-│     └── InventoryController.java
-│
-├── service
-│     ├── InventoryService.java
-│     └── InventoryServiceImpl.java
-│
-├── model
-│     ├── RoomType.java
-│     └── RoomInventory.java
-│
-├── exception
-│     └── RoomNotFoundException.java
-│
-└── MainApplication.java
-```
+### 1. **SearchController**
 
----
+* Acts as the entry point for UC2
+* Calls the service layer
+* Displays results to the user
 
-## ⚙️ Tech Stack
+### 2. **SearchService**
 
-* Java 17+
-* Core Java Collections
-* ConcurrentHashMap (for thread safety)
+* Interface defining search functionality
+
+### 3. **SearchServiceImpl**
+
+* Implements search logic
+* Fetches data from InventoryService
+* Filters available rooms
+
+### 4. **InventoryService**
+
+* Provides room count and price data
+
+### 5. **RoomInventory Model**
+
+* Represents room details (type, count, price)
 
 ---
 
-## 🧠 Key Design Concepts
+## 🔄 Flow of Execution
 
-### 1. Data Structure
+1. User triggers search (via `SearchController`)
+2. Controller calls `SearchService`
+3. Service fetches:
 
-* `ConcurrentHashMap<RoomType, RoomInventory>`
-* Provides:
+  * Room counts
+  * Room prices
+4. Filters rooms where:
 
-    * O(1) lookup
-    * Thread-safe operations
-
-### 2. Object-Oriented Design
-
-* Encapsulation using `RoomInventory`
-* Enum for fixed room types
-* Service layer abstraction
-
-### 3. Separation of Concerns
-
-* Controller → Handles flow
-* Service → Business logic
-* Model → Data representation
-* Exception → Error handling
+   ```
+   count > 0
+   ```
+5. Returns list of available rooms
+6. Controller displays results
 
 ---
 
-## 🔄 Use Case Flow
+## ⚙️ Key Logic
 
-```
-Admin Action → Controller → Service → Inventory Map → Response
-```
-
-### Example Flow:
-
-1. Add room type
-2. Store in inventory
-3. Update count/price
-4. Fetch and confirm availability
-
----
-
-## 🚀 How to Run
-
-### 1. Compile
-
-```bash
-javac com/bookmystay/MainApplication.java
-```
-
-### 2. Run
-
-```bash
-java com.bookmystay.MainApplication
+```java
+if (count > 0) {
+    result.add(new RoomInventory(type, count, price));
+}
 ```
 
 ---
 
-## 🧪 Sample Execution
+## ✅ Expected Output
+
+### Case 1: Rooms Available
 
 ```
-Added: SINGLE
-Added: DOUBLE
-Updated count: SINGLE
-Updated price: DOUBLE
-RoomInventory{roomType=SINGLE, availableCount=8, pricePerNight=2000.0}
-RoomInventory{roomType=DOUBLE, availableCount=5, pricePerNight=3700.0}
+✅ Available Rooms:
+RoomInventory{roomType=SINGLE, count=5, price=1200.0}
+RoomInventory{roomType=DOUBLE, count=3, price=2000.0}
+RoomInventory{roomType=SUITE, count=1, price=5000.0}
+```
+
+### Case 2: No Rooms Available
+
+```
+❌ No rooms available
 ```
 
 ---
 
-## 📏 Coding Standards Followed
+## 🚫 Exception Handling Strategy
 
-* PascalCase → Class names
-* camelCase → Methods & variables
-* UPPER_CASE → Constants
-* Proper JavaDocs for all classes
-* Clean package structure
+* ❌ No exception is thrown if no rooms are available
+* ✅ Empty list is returned instead
+* Improves user experience and prevents application crash
 
 ---
 
-## ⚠️ Limitations
+## 🧠 Design Decisions
 
-* No booking functionality yet
-* No database persistence
-* No concurrency locking for reservations
-
----
-
-## 🔮 Future Enhancements
-
-* Booking system (Use Case 2)
-* Room locking (prevent double booking)
-* Payment integration
-* REST APIs (Spring Boot)
-* Database integration (MySQL/PostgreSQL)
-* Distributed cache (Redis)
+* Uses **InventoryService** as a data source (separation of concerns)
+* Uses **RoomInventory model** for structured data
+* Avoids exposing internal data structures directly
+* Keeps logic simple and scalable
 
 ---
 
-## 👨‍💻 Author
+## 🚀 Future Enhancements
 
-Prabhu Nagamani
+* Filter by price range
+* Filter by room type
+* Add date-based availability
+* Pagination for large datasets
 
 ---
 
-## 📌 Version
+## 🏁 Conclusion
 
-v1.0 – Use Case 1 (Room Inventory Management)
+UC2 successfully enables users to:
+
+* View available rooms
+* Get real-time inventory data
+* Experience smooth and crash-free search functionality
+
+---
