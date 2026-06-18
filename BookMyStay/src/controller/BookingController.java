@@ -4,23 +4,19 @@ import model.Reservation;
 import model.RoomType;
 import service.BookingService;
 
-/**
- * Controller for booking requests.
- */
 public class BookingController {
 
-    private final BookingService bookingService;
+    private final BookingService service;
 
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
+    public BookingController(BookingService service) {
+        this.service = service;
     }
 
     public void book(RoomType type, int count) {
-        Reservation reservation = new Reservation(type, count);
-        bookingService.requestBooking(reservation);
+        service.requestBooking(new Reservation(type, count));
     }
 
     public void process() {
-        bookingService.processBookings();
+        service.processBookings();
     }
 }
